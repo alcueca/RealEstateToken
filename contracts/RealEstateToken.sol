@@ -26,10 +26,11 @@ contract RealEstateToken is ERC20, Ownable {
     /**
      * @notice The funds in this contract that haven't been distributed yet.
      */
-    uint256 internal withheld;
+    uint256 internal accumulated;
 
     /**
-     * @notice The constructor for the Real Estate Token.
+     * @notice The constructor for the Real Estate Token. This contract relates
+     * to a unique real estate portfolio and each token minted is a share.
      * @param _owner The address to receive all tokens on construction.
      * @param _supply The amount of tokens to mint on construction.
      */
@@ -42,11 +43,26 @@ contract RealEstateToken is ERC20, Ownable {
     /**
      * @notice Method to send Ether to this contract.
      */
-    function pay()
+    function ()
         external
         payable
     {
-        withheld += msg.value;
+        accumulated += msg.value;
+    }
+
+    /**
+     * @notice Transfers are only allowed to registered stakeholders.
+     * @param _recipient The address to receive the RealEstateTokens.
+     * @param _amount The amount of RealEstateTokens to send.
+     */
+    function transfer(address _recipient, uint256 _amount)
+        public
+        returns (bool)
+    {
+        (bool isStakeholder, ) = isStakeholder(_recipient);
+        require(isStakeholder);
+        _transfer(msg.sender, _recipient, _amount);
+        return true;
     }
 
     // ---------- STAKEHOLDERS ----------
@@ -74,6 +90,7 @@ contract RealEstateToken is ERC20, Ownable {
      */
     function addStakeholder(address _stakeholder)
         public
+        onlyOwner
     {
         (bool _isStakeholder, ) = isStakeholder(_stakeholder);
         if (!_isStakeholder) stakeholders.push(_stakeholder);
@@ -85,54 +102,13 @@ contract RealEstateToken is ERC20, Ownable {
      */
     function removeStakeholder(address _stakeholder)
         public
+        onlyOwner
     {
         (bool _isStakeholder, uint256 s) = isStakeholder(_stakeholder);
         if (_isStakeholder){
             stakeholders[s] = stakeholders[stakeholders.length - 1];
             stakeholders.pop();
         }
-    }
-
-    /**
-     * @notice Transfers are only allowed to registered stakeholders.
-     */
-    function transfer(address recipient, uint256 amount)
-        public
-        returns (bool)
-    {
-        require(isStakeholder(recipient));
-        _transfer(msg.sender, recipient, amount);
-        return true;
-    }
-
-    // ---------- REVENUE ----------
-
-    /**
-     * @notice A method to allow a stakeholder to check his revenue.
-     * @param _stakeholder The stakeholder to check revenue for.
-     */
-    function revenueOf(address _stakeholder)
-        public
-        view
-        returns(uint256)
-    {
-        return revenues[_stakeholder];
-    }
-
-    /**
-     * @notice A method to get the aggregated revenue from all stakeholders.
-     * @return uint256 The aggregated revenue from all stakeholders.
-     */
-    function totalRevenue()
-        public
-        view
-        returns(uint256)
-    {
-        uint256 _totalRevenues = 0;
-        for (uint256 s = 0; s < stakeholders.length; s += 1){
-            _totalRevenues = _totalRevenues.add(revenues[stakeholders[s]]);
-        }
-        return _totalRevenues;
     }
 
     /**
@@ -147,6 +123,7 @@ contract RealEstateToken is ERC20, Ownable {
         return balanceOf(_stakeholder) / totalSupply();
     }
 
+    // ---------- REVENUE ----------
     /**
      * @notice A method to distribute revenues to all stakeholders.
      */
@@ -157,7 +134,7 @@ contract RealEstateToken is ERC20, Ownable {
         for (uint256 s = 0; s < stakeholders.length; s += 1){
             address stakeholder = stakeholders[s];
             uint256 revenue = address(this).balance * getShare(stakeholder);
-            withheld = withheld.sub(revenue);
+            accumulated = accumulated.sub(revenue);
             revenues[stakeholder] = revenues[stakeholder].add(revenue);
         }
     }
@@ -170,6 +147,6 @@ contract RealEstateToken is ERC20, Ownable {
     {
         uint256 revenue = revenues[msg.sender];
         revenues[msg.sender] = 0;
-        address(this).transfer(msg.sender, revenue);
+        address(msg.sender).transfer(revenue);
     }
 }
