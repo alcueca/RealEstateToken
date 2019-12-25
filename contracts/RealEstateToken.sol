@@ -39,12 +39,6 @@ contract RealEstateToken is ERC20, Ownable {
         _mint(_owner, _supply);
     }
 
-    // constructor( uint256 _supply)
-    //     public
-    // {
-    //     _mint(msg.sender, _supply);
-    // }
-
     /**
      * @notice Method to send Ether to this contract.
      */
