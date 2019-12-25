@@ -30,7 +30,7 @@ contract RealEstateToken is ERC20, Ownable {
     /**
      * @notice The constructor for the Real Estate Token. This contract relates
      * to a unique real estate portfolio and each token minted is a share.
-     * @param _owner The owner of the contract
+     * @param _owner The address to receive all tokens on construction.
      * @param _supply The amount of tokens to mint on construction.
      */
     constructor(address _owner, uint256 _supply)
