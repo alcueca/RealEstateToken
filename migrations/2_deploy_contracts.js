@@ -1,5 +1,7 @@
-const SimpleStorage = artifacts.require('./SimpleStorage.sol');
+const RealEstateTokenFactory = artifacts.require('./RealEstateTokenFactory.sol');
 
-module.exports = (deployer) => {
-    deployer.deploy(SimpleStorage);
+module.exports = async (deployer) => {
+    await deployer.deploy(RealEstateTokenFactory);
+    let instance = await RealEstateTokenFactory.deployed();
+    await instance.createRealEstateToken(1000);
 };

@@ -4,7 +4,6 @@ import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
-
 /**
  * @title Real Estate Token
  * @author Alberto Cuesta Canada
@@ -31,7 +30,7 @@ contract RealEstateToken is ERC20, Ownable {
     /**
      * @notice The constructor for the Real Estate Token. This contract relates
      * to a unique real estate portfolio and each token minted is a share.
-     * @param _owner The address to receive all tokens on construction.
+     * @param _owner The owner of the contract
      * @param _supply The amount of tokens to mint on construction.
      */
     constructor(address _owner, uint256 _supply)
@@ -39,6 +38,12 @@ contract RealEstateToken is ERC20, Ownable {
     {
         _mint(_owner, _supply);
     }
+
+    // constructor( uint256 _supply)
+    //     public
+    // {
+    //     _mint(msg.sender, _supply);
+    // }
 
     /**
      * @notice Method to send Ether to this contract.
