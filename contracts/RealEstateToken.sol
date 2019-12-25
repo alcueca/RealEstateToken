@@ -4,7 +4,6 @@ import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
-
 /**
  * @title Real Estate Token
  * @author Alberto Cuesta Canada
